@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import ErrorNotification from './components/ErrorNotification'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import { use } from 'react'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -19,6 +21,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null) // Here we store the user token
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService
@@ -75,60 +79,6 @@ const App = () => {
     }
   }
 
-  // Helper functions for generating the login forms
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <h1>Login</h1>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  )
-
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <input
-        value={newTitle}
-        onChange={handleTitleChange}
-        placeholder='Title'
-      />
-      <br />
-      <input
-        value={newAuthor}
-        onChange={handleAuthorChange}
-        placeholder='Author'
-      />
-      <br />
-      <input
-        value={newUrl}
-        onChange={handleUrlChange}
-        placeholder='Url'
-      />
-      <br />
-      <input
-        value={newLikes}
-        onChange={handleLikesChange}
-        placeholder='Likes'
-      />
-      <button type="submit">Save</button>
-    </form>
-  )
-
   const handleTitleChange = (event) => {
     setNewTitle(event.target.value)
   }
@@ -147,6 +97,7 @@ const App = () => {
 
   const addBlog = (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
     const blogObject = {
       title: newTitle,
       author: newAuthor,
@@ -171,24 +122,41 @@ const App = () => {
 
   return (
     <div>
+      <h1>Blogs</h1>
       <Notification message={notificationMessage} />
       <ErrorNotification message={errorMessage} />
 
-      {/* {user === null && loginForm()}
-      {user !== null && blogForm()} */}
+      <Togglable buttonLabel='login'>
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />
+      </Togglable>
 
-      {/* or */}
-
-      {user === null ? 
-        loginForm() : 
+       {user !== null &&
         <div>
-          <p>{user.name} logged-in</p>
-          <button onClick={handleLogout}>Logout</button>
-          {blogForm()}
-          <h2>blogs</h2>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
-          )}
+           <p>{user.name} logged-in</p>
+           <button onClick={handleLogout}>Logout</button>
+           <Togglable buttonLabel='new blog' ref={blogFormRef}>
+              <BlogForm
+                addBlog={addBlog}
+                handleTitleChange={handleTitleChange}
+                handleAuthorChange={handleAuthorChange}
+                handleUrlChange={handleUrlChange}
+                handleLikesChange={handleLikesChange}
+                newTitle={newTitle}
+                newAuthor={newAuthor}
+                newUrl={newUrl}
+                newLikes={newLikes}
+              />
+           </Togglable>
+           <h2>blogs</h2>
+           {blogs.map(blog =>
+           <Blog key={blog.id} blog={blog} />
+           )}
         </div>
       }
     </div>
