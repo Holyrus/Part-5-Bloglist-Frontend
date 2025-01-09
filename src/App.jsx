@@ -24,12 +24,6 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  useEffect(() => {
-    blogService
-      .getAll()
-      .then(initialBlogs => setBlogs(initialBlogs))
-  }, [user])
-
   // When we enter the page, all checks if user is already logged in and can be found in local storage
 
   useEffect(() => {
@@ -40,6 +34,12 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  useEffect(() => {
+    blogService
+      .getAll()
+      .then(initialBlogs => setBlogs(initialBlogs))
+  }, [user])
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
@@ -120,21 +120,57 @@ const App = () => {
       })
   }
 
-  const handleLikeAddition = (id) => {
-    const blog = blogs.find(blog => blog.id === id)
-    const changedBlog = { ...blog, likes: blog.likes + 1 }
+  const updateBlog = id => {
+    const likedBlog = blogs.find(blog => blog.id === id)
+
+    const blogObject = {
+      // title: likedBlog.title,
+      // author: likedBlog.author,
+      // url: likedBlog.url,
+      // user: likedBlog.user,
+      ...likedBlog,
+      likes: likedBlog.likes += 1
+    }
 
     blogService
-      .update(id, changedBlog)
+      .update(id, blogObject)
       .then(returnedBlog => {
-        setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+        setBlogs(
+          blogs.map(blog => (blog.id === returnedBlog.id ? returnedBlog : blog))
+        )
+        setNotificationMessage('Like added')
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
       })
       .catch(error => {
-        setErrorMessage('Error updating the blog')
+        setErrorMessage('Cannot add Like', error.response.data)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
       })
+  }
+
+  const deleteBlog = id => {
+    const blogToDelete = blogs.find(blog => blog.id === id)
+
+    if (window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}`)) {
+      blogService
+        .remove(id)
+        .then(() => {
+          setBlogs(blogs.filter(blog => blog.id !== id))
+          setNotificationMessage('Blog removed')
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage('Cannot remove blog', error.response.data)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+    }
   }
 
   return (
@@ -171,8 +207,17 @@ const App = () => {
               />
            </Togglable>
            <h2>blogs</h2>
-           {blogs.map(blog =>
-           <Blog key={blog.id} blog={blog} addLike={handleLikeAddition} />
+           {blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map(blog =>
+              <Blog
+                key={blog.id}
+                blog={blog}
+                updateBlog={updateBlog}
+                deleteBlog={deleteBlog}
+                user={blog.user.username}
+                currentUser={user}
+              />
            )}
         </div>
       }
