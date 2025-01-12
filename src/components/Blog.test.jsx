@@ -33,6 +33,9 @@ test('Renders content of the blog', () => {
   expect(div).toHaveTextContent(
     'Component testing is done with react-testing-library'
   )
+  expect(div).toHaveTextContent(
+    'Test Author'
+  )
   expect(div).not.toHaveTextContent(
     'www.testurl.com'
   )
@@ -58,15 +61,15 @@ test('Clicking the button calls event handler once', async () => {
     likes: 5
   }
 
-  const mockHandler = vi.fn()
-
-  render(
-    <Blog blog={blog} updateBlog={mockHandler} />
-  )
+  const { container } = render(<Blog blog={blog} />)
 
   const user = userEvent.setup()
   const button = screen.getByText('View')
   await user.click(button)
 
-  expect(mockHandler.mock.calls).toHaveLength(1)
+  const div = container.querySelector('.blog')
+
+  expect(div).toHaveTextContent('5')
+
+  expect(div).toHaveTextContent('www.testurl.com')
 })

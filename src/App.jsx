@@ -10,10 +10,6 @@ import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
-  const [newLikes, setNewLikes] = useState('')
 
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
@@ -39,7 +35,7 @@ const App = () => {
     blogService
       .getAll()
       .then(initialBlogs => setBlogs(initialBlogs))
-  }, [user])
+  }, [blogs])
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
@@ -79,41 +75,14 @@ const App = () => {
     }
   }
 
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value)
-  }
-
-  const handleLikesChange = (event) => {
-    setNewLikes(event.target.value)
-  }
-
-  const addBlog = (event) => {
-    event.preventDefault()
+  const addBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility()
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-      likes: newLikes
-    }
 
     blogService
       .create(blogObject)
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
-        setNewTitle('')
-        setNewAuthor('')
-        setNewUrl('')
-        setNewLikes('')
-        setNotificationMessage(`A new blog ${newTitle} by ${newAuthor} added`)
+        setNotificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
         setTimeout(() => {
           setNotificationMessage(null)
         }, 5000)
@@ -124,10 +93,6 @@ const App = () => {
     const likedBlog = blogs.find(blog => blog.id === id)
 
     const blogObject = {
-      // title: likedBlog.title,
-      // author: likedBlog.author,
-      // url: likedBlog.url,
-      // user: likedBlog.user,
       ...likedBlog,
       likes: likedBlog.likes += 1
     }
@@ -195,15 +160,7 @@ const App = () => {
            <button onClick={handleLogout}>Logout</button>
            <Togglable buttonLabel='new blog' ref={blogFormRef}>
               <BlogForm
-                addBlog={addBlog}
-                handleTitleChange={handleTitleChange}
-                handleAuthorChange={handleAuthorChange}
-                handleUrlChange={handleUrlChange}
-                handleLikesChange={handleLikesChange}
-                newTitle={newTitle}
-                newAuthor={newAuthor}
-                newUrl={newUrl}
-                newLikes={newLikes}
+                createBlog={addBlog}
               />
            </Togglable>
            <h2>blogs</h2>
@@ -216,7 +173,7 @@ const App = () => {
                 updateBlog={updateBlog}
                 deleteBlog={deleteBlog}
                 user={blog.user.username}
-                currentUser={user}
+                canUserDelete={user.username === blog.user.username}
               />
            )}
         </div>

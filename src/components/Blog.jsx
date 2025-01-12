@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, canUserDelete, user }) => {
   const [allVisible, setAllVisible] = useState(false)
 
   const blogStyle = {
@@ -11,23 +11,25 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
     marginBottom: 5
   }
 
+  const removeBtn = () => {
+    return <button onClick={() => deleteBlog(blog.id)}>Remove</button>
+  }
+
   return (
     <div style={blogStyle} className='blog'>
       {/* CSS attribute className 'blog' is used for access the component in tests */}
       <ul>
         <li>{blog.title}<button onClick={() => setAllVisible(!allVisible)}>View</button></li>
-
+        <li>{blog.author} </li>
         {allVisible && (
         <div>
-          <li>{blog.author} </li>
           <li>{blog.url}</li> 
           <li>{blog.likes}<button onClick={() => updateBlog(blog.id)}>Like</button></li>
-          <li>Created by {blog.user.username}</li>
+          <li>Created by {user}</li>
         </div>
         )}
-        {currentUser.username === blog.user.username &&
-          <button onClick={() => deleteBlog(blog.id)}>Remove</button>
-        }
+        {canUserDelete && 
+        removeBtn()}
       </ul>
     </div>
   )

@@ -6,7 +6,7 @@ test('<BlogForm /> updates parent state and calls onSubmit', async () => {
   const createBlog = vi.fn()
   const user = userEvent.setup()
 
-  render(<BlogForm addBlog={addBlog} />)
+  render(<BlogForm createBlog={createBlog} />)
 
   const title = screen.getByPlaceholderText('Title')
   const author = screen.getByPlaceholderText('Author')
@@ -23,4 +23,8 @@ test('<BlogForm /> updates parent state and calls onSubmit', async () => {
 
   expect(createBlog.mock.calls).toHaveLength(1)
   expect(createBlog.mock.calls[0][0].title).toBe('test Title')
+  expect(createBlog.mock.calls[0][0].author).toBe('test Author')
+  expect(createBlog.mock.calls[0][0].url).toBe('http:test-url.com')
+
+  screen.debug()
 })
