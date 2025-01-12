@@ -53,7 +53,7 @@ test('Renders content of the blog', () => {
 
 // Test for checking the functionality of clicking button
 
-test('Clicking the button calls event handler once', async () => {
+test('Clicking the button reveal the URL and number of Likes', async () => {
   const blog = {
     title: 'Component testing is done with react-testing-library',
     author: 'Test Author',
@@ -72,4 +72,28 @@ test('Clicking the button calls event handler once', async () => {
   expect(div).toHaveTextContent('5')
 
   expect(div).toHaveTextContent('www.testurl.com')
+})
+
+// Test which ensures if the 'like' button clicked twice it will be called twice
+
+test('Clicking "Like" twice call event twice', async () => {
+  const blog = {
+    title: 'Component testing is done with react-testing-library',
+    author: 'Test Author',
+    url: 'www.testurl.com',
+    likes: 5
+  }
+
+  const mockHandler = vi.fn()
+
+  render(<Blog blog={blog} updateBlog={mockHandler} />)
+
+  const user = userEvent.setup()
+  const viewButton = screen.getByText('View')
+  await user.click(viewButton)
+  const likeButton = screen.getByText('Like')
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
 })
