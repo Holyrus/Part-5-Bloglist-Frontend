@@ -12,4 +12,12 @@ export default defineConfig({
       },
     },
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './testSetup.js',
+  }
 })
+
+// With glovals: true, there is no need to import keywords such as
+// describe, test and expect into tests.

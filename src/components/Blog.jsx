@@ -12,7 +12,8 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
+      {/* CSS attribute className 'blog' is used for access the component in tests */}
       <ul>
         <li>{blog.title}<button onClick={() => setAllVisible(!allVisible)}>View</button></li>
 

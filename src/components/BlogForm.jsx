@@ -2,7 +2,7 @@
 const BlogForm = ({ addBlog, handleTitleChange, handleAuthorChange, handleUrlChange, handleLikesChange, newTitle, newAuthor, newUrl, newLikes }) => {
   
   return (
-    <div>
+    <div className="formDiv">
       <h2>Create new blog</h2>
 
       <form onSubmit={addBlog}>
