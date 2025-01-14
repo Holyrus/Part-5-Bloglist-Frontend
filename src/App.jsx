@@ -35,7 +35,7 @@ const App = () => {
     blogService
       .getAll()
       .then(initialBlogs => setBlogs(initialBlogs))
-  }, [blogs])
+  }, [notificationMessage])
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')

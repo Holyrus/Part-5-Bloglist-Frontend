@@ -44,24 +44,28 @@ const BlogForm = ({ createBlog }) => {
 
       <form onSubmit={addBlog}>
         <input
+          data-testid='title'
           value={newTitle}
           onChange={(e) => handleTitleChange(e)}
           placeholder='Title'
         />
         <br />
         <input
+          data-testid='author'
           value={newAuthor}
           onChange={(e) => handleAuthorChange(e)}
           placeholder='Author'
         />
         <br />
         <input
+          data-testid='url'
           value={newUrl}
           onChange={(e) => handleUrlChange(e)}
           placeholder='Url'
         />
         <br />
         <input
+          data-testid='likes'
           value={newLikes}
           onChange={(e) => handleLikesChange(e)}
           placeholder='Likes'
